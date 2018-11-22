@@ -67,39 +67,82 @@ radio.on()
 radio.config(length=65)
 display.show(address, wait=False, loop=True)
 updateMode()
-#for i in range(0, 24, 3):
-#   strip[i // 3] = (128, 64, 0)
-# strip.show()
 
 counter = 0
 
+mode1img = Image(
+    '00000:'
+    '09990:'
+    '00000:'
+    '00000:'
+    '00000:')
+    
+mode2img = Image(
+    '00000:'
+    '09990:'
+    '09990:'
+    '00000:'
+    '00000:')
+    
+mode3img = Image(
+    '00000:'
+    '09990:'
+    '09990:'
+    '09990:'
+    '00000:')
+
+loadingImg = [Image.CLOCK1,Image.CLOCK2,Image.CLOCK3,Image.CLOCK4,Image.CLOCK5,Image.CLOCK6,Image.CLOCK7,Image.CLOCK8,Image.CLOCK9,Image.CLOCK10,Image.CLOCK11,Image.CLOCK12]
+
 while True:
-    if button_b.was_pressed():
-        if address < 254 - 3:
-            address += 1
-
-        display.show(address, wait=False, loop=True)
+    
+    if button_a.is_pressed() and button_b.is_pressed():
+        
+        mode = mode + 1
+        if (mode > 2):
+            mode = 0
+        updateMode()
         save()
-
-    if button_a.was_pressed():
-        if address > 1:
-            address += -1
-
+        if mode == 0:
+            display.show(mode1img)
+        if mode == 1:
+            display.show(mode2img)
+        if mode == 2:
+            display.show(mode3img)
+        sleep(800)
+        button_a.was_pressed()
+        button_b.was_pressed()
+        display.show(loadingImg,delay=50)
         display.show(address, wait=False, loop=True)
-        save()
+        
+    else:
+    
+        if button_b.was_pressed():
+            if address < 254 - 3:
+                address += 1
+
+            display.show(address, wait=False, loop=True)
+            save()
+            #sleep(200)
+
+        if button_a.was_pressed():
+            if address > 1:
+                address += -1
+
+            display.show(address, wait=False, loop=True)
+            save()
+            #sleep(200)
 
     msg = radio.receive_bytes()
     if msg is not None:
         # bank = int(msg[0]) * 64
         mybank = address // 32
         # if (msg[0] == 8):
-        if (msg[0] == 0):
-            display.clear()
-        display.set_pixel(msg[0] % 5, msg[0] // 5, 9)
+        #if (msg[0] == 0):
+        #    display.clear()
+        #display.set_pixel(msg[0] % 5, msg[0] // 5, 9)
         if mybank == msg[0]:
-            # counter = counter + 1
-#            if counter % 10 == 0:
-        # if address > bank and address < (bank + 64) and len(msg) >= ((address - bank) + used):
+            # if address > bank and address < (bank + 64) and len(msg) >= ((address - bank) + used):
+        # NEED FIX FOR OVERLAP OF GROUPS:
             setLights(msg[(address % 32):(address % 32) + used])
 # 
    
