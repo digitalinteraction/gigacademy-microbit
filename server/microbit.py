@@ -15,7 +15,7 @@ def NewData(data):
     for i in range(0,4):
         buf = data[i*32:i*32 + 32]
         buf.insert(0,i)
-	# print buf
+	#print len(buf)
         ser.write(buf)
 	while True:
 		incoming = ord(ser.read(1)[0])
@@ -26,7 +26,7 @@ def NewData(data):
     
 def NewDataCall(data):
     try:
-        print(".")
+        # print(".")
         NewData(data)
     except:
         print("X")
