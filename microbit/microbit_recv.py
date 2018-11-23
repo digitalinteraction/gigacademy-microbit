@@ -6,6 +6,8 @@ mode = 2
 used = 1
 address = 1
 
+currentvalues = []
+
 strip = neopixel.NeoPixel(pin0, 8)
 
 def setLights(data):
@@ -30,12 +32,14 @@ def setLights(data):
 def updateMode():
     global mode
     global used
+    global currentvalues
     if mode == 0:
         used = 1
     if mode == 1:
         used = 3
     if mode == 2:
         used = 24
+    currentvalues = [0]*used
 
 def save():
     global mode
@@ -122,7 +126,6 @@ while True:
 
             display.show(address, wait=False, loop=True)
             save()
-            #sleep(200)
 
         if button_a.was_pressed():
             if address > 1:
@@ -130,19 +133,17 @@ while True:
 
             display.show(address, wait=False, loop=True)
             save()
-            #sleep(200)
 
     msg = radio.receive_bytes()
     if msg is not None:
-        # bank = int(msg[0]) * 64
         mybank = address // 32
-        # if (msg[0] == 8):
         #if (msg[0] == 0):
         #    display.clear()
         #display.set_pixel(msg[0] % 5, msg[0] // 5, 9)
         if mybank == msg[0]:
-            # if address > bank and address < (bank + 64) and len(msg) >= ((address - bank) + used):
-        # NEED FIX FOR OVERLAP OF GROUPS:
-            setLights(msg[(address % 32):(address % 32) + used])
-# 
-   
+            for i in range(0, 1 + min(used-1,(32 - (address % 32)))):
+                currentvalues[i] = msg[(address % 32) + i]
+                
+            setLights(currentvalues)
+        
+        
