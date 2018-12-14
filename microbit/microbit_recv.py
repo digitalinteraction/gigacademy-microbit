@@ -2,13 +2,16 @@ from microbit import *
 import neopixel
 import radio
 
-mode = 2
+mode = 0
 used = 1
 address = 1
 
 currentvalues = []
 
 strip = neopixel.NeoPixel(pin0, 8)
+pin1.set_analog_period(10)
+#pin1.write_digital(1)
+#pin1.write_analog(512)
 
 def setLights(data):
     global mode
@@ -16,17 +19,23 @@ def setLights(data):
     global counter
     counter = counter + 1
     if mode == 2:
-        for i in range(0, 24, 3):
+        for i in range(1, 24, 3):
             # for a strip of 8 lights:
-            strip[i // 3] = (data[i], data[i + 1], data[i + 2])
+            strip[i // 3] = ((data[i] * data[0]) // 255, (data[i + 1] * data[0]) // 255, (data[i + 2] * data[0]) // 255)
+            #strip[i // 3] = (data[i], data[i + 1], data[i + 2])
             # strip[i // 3] = (255, 255, 0)
-            strip.show()
+        strip.show()
     if mode == 1:
-        strip[0] = (data[0], data[1], data[2])
+        for i in range(0, 8, 1):
+            # for a strip of 8 lights:
+            strip[i] = (data[0], data[1], data[2])
         strip.show()
     if mode == 0:
-        # display.show(data[0],wait=False)
-        strip[0] = (data[0], data[0], data[0])
+        for i in range(0, 8, 1):
+            # display.show(data[0],wait=False)
+            strip[i] = (data[0], data[0], data[0])
+            #pin1.write_analog(512)
+        pin1.write_analog(data[0]*2)
         strip.show()
 
 def updateMode():
@@ -38,7 +47,7 @@ def updateMode():
     if mode == 1:
         used = 3
     if mode == 2:
-        used = 24
+        used = 26
     currentvalues = [0]*used
 
 def save():
