@@ -2,9 +2,9 @@ from microbit import *
 import neopixel
 import radio
 
-mode = 1
-used = 3
-address = 31
+mode = 2
+used = 26
+address = 30
 
 currentvalues = []
 
@@ -29,6 +29,9 @@ def setLights(data):
             strip[i] = (data[0], data[0], data[0])
         pin1.write_analog(data[0]*2)
         strip.show()
+
+def showAddress(address):
+    display.scroll(str(address) + " ", wait=False, loop=True)
 
 def updateMode():
     global mode
@@ -62,8 +65,8 @@ def load():
 
 load()
 radio.on()
-radio.config(length=65)
-display.show(address, wait=False, loop=True)
+radio.config(length=66)
+showAddress(address)
 updateMode()
 
 mode1img = Image(
@@ -108,7 +111,7 @@ while True:
         button_a.was_pressed()
         button_b.was_pressed()
         display.show(loadingImg, delay=50)
-        display.show(address, wait=False, loop=True)
+        showAddress(address)
         
     else:
     
@@ -116,7 +119,7 @@ while True:
             if address < 254 - 3:
                 address += 1
 
-            display.show(address, wait=False, loop=True)
+            showAddress(address)
             strip.clear()
             currentvalues = [0]*used
             setLights(currentvalues)
@@ -126,40 +129,32 @@ while True:
             if address > 1:
                 address += -1
 
-            display.show(address, wait=False, loop=True)
+            showAddress(address)
             strip.clear()
             currentvalues = [0]*used
             setLights(currentvalues)
             save()
-
-    #display.show(used, wait=True, loop=True)
-
+            
     msg = radio.receive_bytes()
     if msg is not None:
         mybank = (address-1) // 32
         if mybank == msg[0]:
-            # THIS IS STILL BROKEN! MISSING OUT ON LAST ELEMENT IN THE INCOMING ARRAY (i.e. 32)
             
             for i in range(0, min(used, (32 - ((address-1) % 32)))):
                 currentvalues[i] = msg[1 + ((address-1) % 32) + i]
             
-            
-            #for i in range(0, min(used, (address % 32))):
-            #    currentvalues[i] = msg[1 + i]
-            #for i in range(0, used):
-                #currentvalues[i] = msg[(address // 32) + i]
             setLights(currentvalues)
         
         # overlap into next bank:
-        #if ((address % 32) + used > 32):
+        if (((address - 1) % 32) + used > 32):
             # if it matches the next bank up
-        #    startindex = (32 - (address % 32))
-        #    endindex = used - startindex
+            startindex = (32 - ((address - 1) % 32))
+            endindex = used - startindex
             
-            #if mybank+1 == msg[0]:
-            #    for i in range(0, endindex):
-            #        currentvalues[i + startindex + 1] = msg[i]
-            #    setLights(currentvalues)
+            if mybank+1 == msg[0]:
+                for i in range(0, endindex):
+                    currentvalues[i + startindex] = msg[1 + i]
+                setLights(currentvalues)
         
         
         
