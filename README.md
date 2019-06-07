@@ -30,7 +30,7 @@ Each microbit mode can be set to one of by pressing both buttons together:
 - Install OLA Lighting Server and Python API with `sudo apt-get install ola ola-python`
 - Get server code with `git clone https://github.com/digitalinteraction/gigacademy-microbit.git`
 - Install Python dependencies `cd gigacademy-microbit/server && pip install -r requirements.txt`
-- To start on boot, add the following line to the bottom of `.bashrc`
+- To start on boot, add the following line to the bottom of `.bashrc`, and setup PI to auto login to terminal on boot using `raspi-config`.
 
 `python /home/pi/server/microbit.py`
 - We also advise changing the RPI settings using `raspi-config` to wait for network on boot, which helps the OLA server start correctly.
@@ -39,3 +39,38 @@ Each microbit mode can be set to one of by pressing both buttons together:
 ## Configuration
 
 - To control the lighting system you will need to add either an incoming DMX hardware channel (i.e. using a DMX dongle), or activate ACN, ARTNET or another IP protocol. This can be done using the admin panel at http://ipaddressofpi:9090
+
+## Lamp Personalities
+
+The proxy lamps have 3 current personalities:
+
+Mode 1:
+
+Single channel dimmer (0-255). Exposes as PWM signal on PIN 1.
+
+```
+|---|
+|   |
+|   |
+```
+
+Mode 2:
+
+3 Channel RGB (0-255). Exposes as 3 item Neopixel string on PIN0 (rgb).
+
+
+```
+|---|
+|---|
+|   |
+```
+
+Mode 3:
+
+26 Channel 8 segment RGB (0-255). Channel 1 controls master dimmer (0-255). Each consecutive 3 channels is RGB for segment. Channel 26 is ignored.  Exposes as 8 item Neopixel string on PIN0 (rgb).
+
+```
+|---|
+|---|
+|---|
+```
